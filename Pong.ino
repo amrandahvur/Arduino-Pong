@@ -27,23 +27,44 @@ unsigned long lastRefreshTime=0;
 const int refreshInterval = 150;
 byte gameState = 1;
 byte ballSpeed = 2;
-byte player1WinCount = 0;
-byte player2WinCount = 0;
+int player1WinCount = 0;
+int player2WinCount = 0;
 byte hitCount = 0;
 
 void setup(){
   //Serial.begin(9600);
   LcdInitialise();
   restartGame();
+  while(player1WinCount<=10 || player2WinCount<=10)
+  {
+    unsigned long now = millis();
+    if(now - lastRefreshTime > refreshInterval){
+        update();
+        refreshScreen();
+        lastRefreshTime = now;
+    }
+  }
+  if(player1WinCount==10)
+  {
+    for(int i=0; i<504; i++) LcdWrite(LCD_D,0x00);
+    LcdXY(30,12);
+    LcdWriteString("Player 1 Wins");
+  }
+  if(player2WinCount==10)
+  {
+    for(int i=0; i<504; i++) LcdWrite(LCD_D,0x00);
+    LcdXY(30,12);
+    LcdWriteString("Player 2 Wins");
+  }
 }
 
 void loop(){
-  unsigned long now = millis();
-  if(now - lastRefreshTime > refreshInterval){
-      update();
-      refreshScreen();
-      lastRefreshTime = now;  
-  }  
+  //unsigned long now = millis();
+  //if(now - lastRefreshTime > refreshInterval){
+    //  update();
+      //refreshScreen();
+      //lastRefreshTime = now;
+  //}
 }
 
 void restartGame(){
@@ -51,9 +72,21 @@ void restartGame(){
    gameState = 1;
    ballX = random(0, 60);
    ballY = 20;
-   isBallUp = false; 
+   isBallUp = false;
    isBallRight = true;
    hitCount = 0;
+}
+void LcdWriteCharacter(char character)
+{   for(int i=0; i<5; i++) LcdWrite(LCD_D,ASCII[character - 0x20][i]);
+LcdWrite(LCD_D,0x00);
+}
+void LcdWriteString(char* characters)
+{   while(*characters) LcdWriteCharacter(*characters++);
+}
+void LcdXY(int x, int y)
+{
+  LcdWrite(LCD_C,0x80 | x);  // Column.
+  LcdWrite(LCD_C,0x40 | y);  // Row.
 }
 
 void refreshScreen(){
@@ -72,7 +105,7 @@ void refreshScreen(){
              }
              pixel = pixel | ballMask;
            }
-           
+
            // draw bars if in the frame
            if(x >= bar1X && x <= bar1X + barWidth -1 && bar1Y + barHeight > realY && bar1Y < realY + 8 ){
              byte barMask = 0x00;
@@ -83,7 +116,7 @@ void refreshScreen(){
              }
              pixel = pixel | barMask;
            }
-           
+
            if(x >= bar2X && x <= bar2X + barWidth -1 && bar2Y + barHeight > realY && bar2Y < realY + 8 ){
              byte barMask = 0x00;
              for(int i = 0; i < realY + 8 - bar2Y; i++){
@@ -97,7 +130,7 @@ void refreshScreen(){
          }
     }
   } else if(gameState == 2){
-      
+
   }
 }
 
@@ -108,10 +141,10 @@ void update(){
      int pot2 = analogRead(A1);
      bar1X = pot1 / 2 * LCD_X / 512;
      bar2X = pot2 / 2 * LCD_X / 512;
-    
+
      if(bar1X > barMargin) bar1X = barMargin;
      if(bar2X > barMargin) bar2X = barMargin;
-     
+
      //move the ball now
      if(isBallUp)
        ballY -= ballSpeed;
@@ -121,7 +154,7 @@ void update(){
        ballX += ballSpeed;
      else
        ballX -= ballSpeed;
-     //check collisions  
+     //check collisions
      if(ballX < 1){
        isBallRight = true;
        ballX = 0;
@@ -138,7 +171,7 @@ void update(){
          else
            isBallRight = true;
          ballY = barHeight;
-         if(++hitCount % 10 == 0 && ballSpeed < 5) 
+         if(++hitCount % 10 == 0 && ballSpeed < 5)
            ballSpeed++;
        }else{ //player2 wins
          gameState = 2;
@@ -147,13 +180,13 @@ void update(){
      }
      if(ballY + ballPerimeter > LCD_Y * 8 - barHeight){
        if(ballX + ballPerimeter >= bar2X && ballX <= bar2X + barWidth){ //ball bounces from bar2
-         isBallUp = true; 
+         isBallUp = true;
          if(ballX + ballPerimeter/2 < bar2X + barWidth/2)
            isBallRight = false;
          else
            isBallRight = true;
          ballY = LCD_Y * 8 - barHeight - ballPerimeter;
-         if(++hitCount % 10 == 0 && ballSpeed < 5) 
+         if(++hitCount % 10 == 0 && ballSpeed < 5)
            ballSpeed++;
        }else{ // player 1 wins
          gameState = 2;
@@ -168,7 +201,7 @@ void update(){
         delay(300);
       }
       restartGame();
-  }  
+  }
 }
 
 void LcdInitialise(void){
@@ -182,7 +215,7 @@ void LcdInitialise(void){
   delay(500);
   digitalWrite(PIN_RESET, HIGH);
   LcdWrite(LCD_C, 0x21 );  // LCD Extended Commands.
-  LcdWrite(LCD_C, 0xB8 );  // Set LCD Vop (Contrast). 
+  LcdWrite(LCD_C, 0xB8 );  // Set LCD Vop (Contrast).
   LcdWrite(LCD_C, 0x04 );  // Set Temp coefficent. //0x04
   LcdWrite(LCD_C, 0x14 );  // LCD bias mode 1:48. //0x13
   LcdWrite(LCD_C, 0x0C );  // LCD in normal mode.
