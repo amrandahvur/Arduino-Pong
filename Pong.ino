@@ -35,7 +35,7 @@ void setup(){
   //Serial.begin(9600);
   LcdInitialise();
   restartGame();
-  while(player1WinCount<=10 || player2WinCount<=10)
+  while(player1WinCount!=2 && player2WinCount!=2)
   {
     unsigned long now = millis();
     if(now - lastRefreshTime > refreshInterval){
@@ -44,16 +44,16 @@ void setup(){
         lastRefreshTime = now;
     }
   }
-  if(player1WinCount==10)
+  if(player1WinCount==2)
   {
     for(int i=0; i<504; i++) LcdWrite(LCD_D,0x00);
-    LcdXY(30,12);
+    LcdXY(15,4);
     LcdWriteString("Player 1 Wins");
   }
-  if(player2WinCount==10)
+  if(player2WinCount==2)
   {
     for(int i=0; i<504; i++) LcdWrite(LCD_D,0x00);
-    LcdXY(30,12);
+    LcdXY(15,4);
     LcdWriteString("Player 2 Wins");
   }
 }
