@@ -35,7 +35,7 @@ void setup(){
   //Serial.begin(9600);
   LcdInitialise();
   restartGame();
-  while(player1WinCount!=2 && player2WinCount!=2)
+  while(player1WinCount!=7 && player2WinCount!=7)
   {
     unsigned long now = millis();
     if(now - lastRefreshTime > refreshInterval){
@@ -44,16 +44,20 @@ void setup(){
         lastRefreshTime = now;
     }
   }
-  if(player1WinCount==2)
+  if(player1WinCount==7)
   {
     for(int i=0; i<504; i++) LcdWrite(LCD_D,0x00);
-    LcdXY(15,4);
+    LcdWrite(LCD_C, 0x0D);  // LCD in inverse mode.
+    delay(300);
+    LcdXY(4,2);
     LcdWriteString("Player 1 Wins");
   }
-  if(player2WinCount==2)
+  if(player2WinCount==7)
   {
     for(int i=0; i<504; i++) LcdWrite(LCD_D,0x00);
-    LcdXY(15,4);
+    LcdWrite(LCD_C, 0x0D);  // LCD in inverse mode.
+    delay(300);
+    LcdXY(4,2);
     LcdWriteString("Player 2 Wins");
   }
 }
