@@ -34,6 +34,15 @@ byte hitCount = 0;
 void setup(){
   //Serial.begin(9600);
   LcdInitialise();
+  for(int i=0; i<504; i++) LcdWrite(LCD_D,0x00);
+  LcdWrite(LCD_C, 0x0D);  // LCD in inverse mode.
+  delay(300);
+  LcdXY(16,2);
+  LcdWriteString("Ping Pong");
+  delay(5000);
+  LcdWrite(LCD_C, 0x0C);  // LCD in inverse mode.
+  delay(300);
+  LcdInitialise();
   restartGame();
   while(player1WinCount!=7 && player2WinCount!=7)
   {
