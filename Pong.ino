@@ -9,7 +9,7 @@
 
 #define LCD_X     84
 #define LCD_Y     6
-
+#include "font.h"
 int barWidth = 16;
 int barHeight = 4;
 int ballPerimeter = 4;
