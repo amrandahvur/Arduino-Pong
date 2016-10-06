@@ -139,6 +139,7 @@ void refreshScreen(){
              }
              pixel = pixel | barMask;
            }
+           //Serial.println(pixel);
            LcdWrite(LCD_D, pixel);
          }
     }
